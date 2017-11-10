@@ -1,12 +1,15 @@
 package edu.orangecoastcollege.cs273.gamersdelight;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * The <code>Game</code> class maintains information about a video game,
  * including its id number, name, description, rating and image name.
  *
  * @author Michael Paulding
  */
-public class Game {
+public class Game implements Parcelable{
 
     //Member variables
     private long mId;
@@ -56,6 +59,18 @@ public class Game {
         mDescription = description;
         mRating = rating;
         mImageName = imageName;
+    }
+
+    /**
+     * Takes {@link Parcel} and create a new Game using values
+     * @param parcel holds the member variable values
+     */
+    private Game(Parcel parcel) {
+        mId = parcel.readLong();
+        mName = parcel.readString();
+        mDescription = parcel.readString();
+        mRating = parcel.readFloat();
+        mImageName = parcel.readString();
     }
 
     /**
@@ -156,4 +171,51 @@ public class Game {
                 ", ImageName='" + mImageName + '\'' +
                 '}';
     }
+
+    /**
+     * Returns 0 if it is a standard parcel, else if sending files
+     * need to return file descriptors
+     * @return 0
+     */
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    /**
+     * Writes all the member variables of the class to the {@link Parcel}.
+     *
+     * @param parcel The package with details about the game
+     * @param i Any custom flags (with files)
+     */
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(mId);
+        parcel.writeString(mName);
+        parcel.writeString(mDescription);
+        parcel.writeFloat(mRating);
+        parcel.writeString(mImageName);
+    }
+
+    public static final Parcelable.Creator<Game> CREATOR = new Creator<Game>() {
+        /**
+         * This method is used with {@link android.content.Intent}s to create new Game objects.
+         * @param parcel The package with all information for the Game
+         * @return The new Game object
+         */
+        @Override
+        public Game createFromParcel(Parcel parcel) {
+            return new Game(parcel);
+        }
+
+        /**
+         * This method is used with JSON to create an {@link java.lang.reflect.Array} of Game objects
+         * @param i The size of the JSON array
+         * @return New array of Games
+         */
+        @Override
+        public Game[] newArray(int i) {
+            return new Game[i];
+        }
+    };
 }
